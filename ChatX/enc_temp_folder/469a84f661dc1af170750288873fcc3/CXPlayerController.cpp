@@ -10,11 +10,6 @@ void ACXPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsLocalController() == false)
-	{
-		return;
-	}
-
 	FInputModeUIOnly InputModeUIOnly;
 	SetInputMode(InputModeUIOnly);
 
@@ -39,4 +34,3 @@ void ACXPlayerController::PrintChatMessageString(const FString& InChatMessageStr
 {
 	UKismetSystemLibrary::PrintString(this, ChatMessageString, true, true, FLinearColor::Red, 5.0f);
 }
-

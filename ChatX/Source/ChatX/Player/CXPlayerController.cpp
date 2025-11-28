@@ -8,6 +8,11 @@
 
 #include "ChatX.h"
 
+#include "EngineUtils.h"
+
+#include "Kismet/GameplayStatics.h"
+#include "Game/CXGameModeBase.h"
+
 void ACXPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -34,7 +39,11 @@ void ACXPlayerController::SetChatMessageString(const FString& InChatMessageStrin
 {
 	ChatMessageString = InChatMessageString;
 
-	PrintChatMessageString(ChatMessageString);
+	//PrintChatMessageString(InChatMessageString);
+	if (IsLocalController() == true)
+	{
+		ServerRPCPrintChatMessageString(InChatMessageString);
+	}
 }
 
 void ACXPlayerController::PrintChatMessageString(const FString& InChatMessageString)
@@ -51,3 +60,29 @@ void ACXPlayerController::PrintChatMessageString(const FString& InChatMessageStr
 
 }
 
+void ACXPlayerController::ClientRPCPrintChatMessageString_Implementation(const FString& InChatMessageString)
+{
+	PrintChatMessageString(InChatMessageString);
+}
+
+void ACXPlayerController::ServerRPCPrintChatMessageString_Implementation(const FString& InChatMessageString)
+{
+	// for (TActorIterator<ACXPlayerController> It(GetWorld()); It; ++It)
+	// {
+	// 	ACXPlayerController* CXPlayerController = *It;
+	// 	if (IsValid(CXPlayerController) == true)
+	// 	{
+	// 		CXPlayerController->ClientRPCPrintChatMessageString(InChatMessageString);
+	// 	}
+	// }
+
+	AGameModeBase* GM = UGameplayStatics::GetGameMode(this);
+	if (IsValid(GM) == true)
+	{
+		ACXGameModeBase* CXGM = Cast<ACXGameModeBase>(GM);
+		if (IsValid(CXGM) == true)
+		{
+			CXGM->PrintChatMessageString(this, InChatMessageString);
+		}
+	}
+}
